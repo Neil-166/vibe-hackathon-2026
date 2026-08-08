@@ -1,0 +1,121 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+    --ab-ink: #0a0a0a;
+    --ab-orange: #ff5a00;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+    /* Decorative glows/strokes may extend past the viewport — clip, never scroll */
+    overflow-x: hidden;
+  }
+
+  body {
+    @apply bg-ink text-white font-body antialiased;
+    min-height: 100dvh;
+    /* Subtle ambient orange glow pinned to the top — keeps the dark
+       surface from feeling flat without adding visual noise. */
+    background-image:
+      radial-gradient(900px 420px at 50% -120px, rgba(255, 90, 0, 0.10), transparent 70%),
+      radial-gradient(1200px 600px at 100% 100%, rgba(255, 90, 0, 0.05), transparent 60%);
+    background-repeat: no-repeat;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background: rgba(255, 90, 0, 0.9);
+    color: #fff;
+  }
+
+  /* Accessible focus ring */
+  :focus-visible {
+    outline: 2px solid var(--ab-orange);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  button {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+@layer components {
+  .container-app {
+    @apply mx-auto w-full max-w-content px-5;
+  }
+
+  .card {
+    @apply rounded-2xl border border-line bg-graphite;
+  }
+
+  /* Hide scrollbars for horizontal strip layouts while keeping scrollability */
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .glow-text {
+    text-shadow: 0 0 24px rgba(255, 90, 0, 0.55);
+  }
+
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* Flame "burn" flicker used on completed heatmap cells + streak flame */
+@keyframes flame-flicker {
+  0%, 100% { transform: scale(1) rotate(-1.5deg); }
+  25% { transform: scale(1.12) rotate(2deg); }
+  50% { transform: scale(0.95) rotate(-2deg); }
+  75% { transform: scale(1.06) rotate(1deg); }
+}
+.animate-flame {
+  animation: flame-flicker 2.4s ease-in-out infinite;
+  transform-origin: 50% 100%;
+}
+
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 rgba(255, 90, 0, 0.55); }
+  70% { box-shadow: 0 0 0 9px rgba(255, 90, 0, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 90, 0, 0); }
+}
+.pulse-ring {
+  animation: pulse-ring 2.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes streak-drift {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+  100% { transform: translateY(0); }
+}
+.animate-streak-drift {
+  animation: streak-drift 4s ease-in-out infinite;
+}
+
+/* Reduce all decorative motion when the user asks for it */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
