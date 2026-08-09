@@ -11,7 +11,7 @@ const ease = [0.25, 0.1, 0.25, 1] as const;
  */
 export default function HeroSection() {
   return (
-    <section className="relative mx-auto flex min-h-[92svh] max-w-[560px] flex-col justify-center px-6 pb-10 pt-24">
+    <section className="relative mx-auto flex min-h-[56svh] max-w-[560px] flex-col justify-center px-6 pb-8 pt-20">
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease }}>
         <p className="mb-4 text-[12px] font-semibold uppercase tracking-[0.2em] text-primary">
           60 Days. One Commitment.

@@ -246,7 +246,7 @@ export default function DayChallengePage() {
             />
 
             <p className="px-1 text-[11px] text-subtle">
-              Submit once all four checklist items are complete.
+              Submit once all {requirements.length} checklist items are complete.
             </p>
 
             {/* ===== Resources ===== */}

@@ -181,10 +181,10 @@ export const day12Challenge: DayChallenge = {
     'Write a concise LinkedIn post about what you learned',
   ],
   requirements: [
-    { id: 'r1', label: 'Create add-expense form', completed: false },
-    { id: 'r2', label: 'Display expense list', completed: false },
-    { id: 'r3', label: 'Show total amount', completed: false },
-    { id: 'r4', label: 'Make the UI mobile responsive', completed: false },
+    { id: 'r1', label: 'Write semantic HTML structure (article, header, sections)', completed: false },
+    { id: 'r2', label: 'Style mobile-first with CSS Grid and Flexbox', completed: false },
+    { id: 'r3', label: 'Add hover/focus transitions and micro-animations', completed: false },
+    { id: 'r4', label: 'Test at 390px width in DevTools and push commit', completed: false },
   ],
   workflow: [
     {
@@ -694,10 +694,10 @@ export const missedDayFlow: MissedDayFlowData = {
   status: 'Paused',
   preview: {
     day: 12,
-    title: 'Expense Tracker UI',
+    title: 'Responsive Portfolio Card',
     estimatedTime: '60–90 min',
     description:
-      'Build a clean expense tracker with add, list, and monthly totals — pure vanilla JS, no frameworks.',
+      'Build a polished, mobile-first developer portfolio card using CSS Grid — no frameworks, pure fundamentals.',
   },
   reminder: {
     label: 'Remind me tomorrow evening',

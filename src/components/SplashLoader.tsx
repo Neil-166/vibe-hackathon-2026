@@ -9,15 +9,15 @@ export default function SplashLoader({ onComplete }: { onComplete: () => void })
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    // Skip if already shown this session
-    if (sessionStorage.getItem(STORAGE_KEY)) {
+    // Skip if already shown this session, or if ?no-splash is in the URL
+    if (sessionStorage.getItem(STORAGE_KEY) || new URLSearchParams(window.location.search).has('no-splash')) {
       setVisible(false);
       onComplete();
       return;
     }
 
     const start = Date.now();
-    const duration = 1800;
+    const duration = new URLSearchParams(window.location.search).has('no-splash') ? 0 : 600;
     let raf = 0;
 
     const tick = () => {

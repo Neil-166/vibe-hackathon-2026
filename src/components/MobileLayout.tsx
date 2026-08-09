@@ -10,7 +10,7 @@ import BottomNav from './BottomNav';
 export default function MobileLayout() {
   const { pathname } = useLocation();
   const outlet = useOutlet();
-  const hideNav = pathname.startsWith('/day/');
+  const hideNav = pathname === '/' || pathname.startsWith('/day/');
 
   return (
     <div className="flex min-h-dvh flex-col">

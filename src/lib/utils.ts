@@ -134,3 +134,59 @@ export function getHeatLevel(completed: boolean, submittedAt: string | null): nu
 export function pluralize(count: number, word: string): string {
   return count === 1 ? `${count} ${word}` : `${count} ${word}s`;
 }
+
+/**
+ * Generate a realistic contribution graph for `totalDays` cells.
+ * Models: weekday streaks (green), weekend gaps (empty), early sporadic commits,
+ * and a ramp-up period — not random sine noise.
+ */
+export function generateHeatmap(totalDays: number = 126): number[] {
+  const cells: number[] = [];
+  const now = new Date();
+  // Start from `totalDays` days ago
+  const start = new Date(now);
+  start.setDate(start.getDate() - totalDays);
+
+  for (let i = 0; i < totalDays; i++) {
+    const date = new Date(start);
+    date.setDate(date.getDate() + i);
+    const dow = date.getDay(); // 0=Sun, 6=Sat
+    const dayIndex = i;
+
+    // Weekend — almost always empty
+    if (dow === 0 || dow === 6) {
+      cells.push(0);
+      continue;
+    }
+
+    // Last 12 weekdays = streak days (the mock student is on day 12)
+    const daysFromEnd = totalDays - i;
+    if (daysFromEnd <= 18 && dow >= 1 && dow <= 5) {
+      // Recent weekday: very likely completed (80–100%)
+      // A couple of missed days mixed in
+      const missed = (dayIndex === totalDays - 3 || dayIndex === totalDays - 14);
+      if (missed) {
+        cells.push(0);
+      } else {
+        cells.push(Math.random() > 0.2 ? 4 : 3); // level 3 or 4
+      }
+      continue;
+    }
+
+    // Older weekdays: sporadic early activity, ramping up
+    if (dayIndex < totalDays * 0.3) {
+      // Early phase: mostly empty with rare commits
+      cells.push(Math.random() > 0.88 ? 1 : 0);
+    } else if (dayIndex < totalDays * 0.6) {
+      // Mid phase: occasional commits
+      cells.push(Math.random() > 0.7 ? Math.floor(Math.random() * 3) + 1 : 0);
+    } else {
+      // Pre-streak: building up
+      cells.push(Math.random() > 0.5 ? Math.floor(Math.random() * 3) + 1 : 0);
+    }
+  }
+  return cells;
+}
+
+/** Shared heatmap color palette (GitHub-style dark theme). */
+export const HEAT_COLORS = ['#151821', '#0e4429', '#006d32', '#26a641', '#39d353'];

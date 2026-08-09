@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Clock, Code2, Flame, Zap, Trophy } from 'lucide-react';
 import { Github, Linkedin } from '@/components/Icons';
 import { Button } from '@/components/ui/button';
+import { day12Challenge } from '@/lib/mock-data';
+import { generateHeatmap, HEAT_COLORS } from '@/lib/utils';
 import HeroSection from '@/components/HeroSection';
 import TrustSection from '@/components/TrustSection';
 import HowItWorks from '@/components/HowItWorks';
@@ -33,16 +35,12 @@ function FadeIn({ children, delay = 0, className = '' }: { children: React.React
 
 /* ─── Contribution Graph ─── */
 function ContributionGraph() {
-  const rows = 7, cols = 18;
-  const cells = Array.from({ length: rows * cols }, (_, i) => {
-    const r = Math.sin(i * 127 + 311) * 0.5 + 0.5;
-    return r > 0.35 ? Math.min(4, Math.floor(r * 5)) : 0;
-  });
-  const heat = ['#151821', '#0e4429', '#006d32', '#26a641', '#39d353'];
+  const cols = 18;
+  const cells = generateHeatmap(7 * cols);
   return (
     <div className="grid gap-[2px]" style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}>
       {cells.map((l, i) => (
-        <div key={i} className="aspect-square rounded-[2px]" style={{ background: heat[l] }} />
+        <div key={i} className="aspect-square rounded-[2px]" style={{ background: HEAT_COLORS[l] }} />
       ))}
     </div>
   );
@@ -167,7 +165,7 @@ export default function Home() {
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-primary">Tonight&apos;s Challenge</p>
-                  <h3 className="mt-0.5 text-[17px] font-bold text-foreground">Day 12 — Expense Tracker UI</h3>
+                  <h3 className="mt-0.5 text-[17px] font-bold text-foreground">Day {day12Challenge.day} — {day12Challenge.title}</h3>
                   <div className="mt-1.5 flex items-center gap-2 text-[12px] text-subtle">
                     <Clock className="h-3.5 w-3.5 text-primary/80" aria-hidden="true" />
                     <span>60–90 min</span>
@@ -279,7 +277,7 @@ export default function Home() {
                 <span>Less</span>
                 <div className="flex items-center gap-1">
                   {[0, 1, 2, 3, 4].map((l) => (
-                    <div key={l} className="h-2.5 w-2.5 rounded-sm" style={{ background: ['#151821', '#0e4429', '#006d32', '#26a641', '#39d353'][l] }} />
+                    <div key={l} className="h-2.5 w-2.5 rounded-sm" style={{ background: HEAT_COLORS[l] }} />
                   ))}
                 </div>
                 <span>More</span>

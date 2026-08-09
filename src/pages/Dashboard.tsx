@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import AnimatedBackground from '@/components/AnimatedBackground';
 
+import DashboardSkeleton from '@/components/DashboardSkeleton';
 import EmptyState from '@/components/EmptyState';
 import EnergyCheckin from '@/components/EnergyCheckin';
 import FocusSprint from '@/components/FocusSprint';
@@ -26,7 +27,7 @@ import {
   achievements, communityFeed, currentStudent, day12Challenge, leaderboard,
   students, type Student,
 } from '@/lib/mock-data';
-import { formatTime, getAvatarColor, getGreeting, getRelativeTime, isAfterTenPM } from '@/lib/utils';
+import { formatTime, generateHeatmap, getAvatarColor, getGreeting, getRelativeTime, HEAT_COLORS, isAfterTenPM } from '@/lib/utils';
 import { STORAGE_KEYS, storageGet, storageSet } from '@/lib/storage';
 
 type StudentState = Student['state'];
@@ -93,12 +94,16 @@ export default function Dashboard() {
     const saved = storageGet<StudentState>(STORAGE_KEYS.dashboardTab);
     return saved && ['active', 'first-day', 'missed-day', 'empty-profile'].includes(saved) ? saved : 'active';
   });
+  const [isLoading, setIsLoading] = useState(true);
   const [submittedToday, setSubmittedToday] = useState(false);
   const [showAllCommunity, setShowAllCommunity] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [resumeOpen, setResumeOpen] = useState(false);
+  const [showStateTabs, setShowStateTabs] = useState(false);
 
   useEffect(() => {
+    // Brief loading state — skeleton clears after 400ms
+    const loadTimer = window.setTimeout(() => setIsLoading(false), 400);
     const tick = window.setInterval(() => setNow(new Date()), 30_000);
     const submissionRead = window.setTimeout(() => {
       setSubmittedToday(Boolean(storageGet(STORAGE_KEYS.day12Submission)));
@@ -106,6 +111,7 @@ export default function Dashboard() {
     return () => {
       window.clearInterval(tick);
       window.clearTimeout(submissionRead);
+      window.clearTimeout(loadTimer);
     };
   }, []);
 
@@ -172,10 +178,10 @@ export default function Dashboard() {
         </div>
       </header>
 
+      {isLoading ? (
+        <DashboardSkeleton />
+      ) : (
       <main className="relative mx-auto max-w-lg space-y-7 px-5 pt-6">
-        {/* ===== Segmented control (demo edge states) ===== */}
-        <StateTabs value={selectedState} onChange={(tab) => { setSelectedState(tab); storageSet(STORAGE_KEYS.dashboardTab, tab); }} />
-
         {/* ===== Edge-state notice ===== */}
         <StateNotice state={selectedState} onProfile={scrollToProfile} onResume={() => setResumeOpen(true)} />
 
@@ -314,18 +320,15 @@ export default function Dashboard() {
             </div>
             <div className="rounded-2xl border border-border bg-surface p-4 shadow-[0_4px_24px_rgba(0,0,0,0.2)]">
               <div className="grid gap-[2px]" style={{ gridTemplateColumns: 'repeat(18, 1fr)' }}>
-                {Array.from({ length: 126 }, (_, i) => {
-                  const r = Math.sin(i * 127 + 311) * 0.5 + 0.5;
-                  const level = r > 0.35 ? Math.min(4, Math.floor(r * 5)) : 0;
-                  const colors = ['#151821', '#0e4429', '#006d32', '#26a641', '#39d353'];
-                  return <div key={i} className="aspect-square rounded-[2px]" style={{ background: colors[level] }} />;
-                })}
+                {generateHeatmap(126).map((level, i) => (
+                  <div key={i} className="aspect-square rounded-[2px]" style={{ background: HEAT_COLORS[level] }} />
+                ))}
               </div>
               <div className="mt-2 flex items-center justify-between text-[10px] text-subtle">
                 <span>Less</span>
                 <div className="flex items-center gap-0.5">
                   {[0, 1, 2, 3, 4].map((l) => (
-                    <div key={l} className="h-2 w-2 rounded-sm" style={{ background: ['#151821', '#0e4429', '#006d32', '#26a641', '#39d353'][l] }} />
+                    <div key={l} className="h-2 w-2 rounded-sm" style={{ background: HEAT_COLORS[l] }} />
                   ))}
                 </div>
                 <span>More</span>
@@ -455,6 +458,32 @@ export default function Dashboard() {
           </section>
         </Reveal>
 
+        {/* ===== Demo: edge-state toggle (for reviewers to explore edge cases) ===== */}
+        <Reveal>
+          <div>
+            <button
+              type="button"
+              onClick={() => setShowStateTabs((v) => !v)}
+              className="flex w-full items-center justify-center gap-1.5 text-[11px] font-medium text-subtle transition-colors hover:text-muted"
+            >
+              {showStateTabs ? 'Hide demo states' : 'Show demo states'} <ChevronDown className={`h-3 w-3 transition-transform ${showStateTabs ? 'rotate-180' : ''}`} />
+            </button>
+            {showStateTabs && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="mt-2 overflow-hidden"
+              >
+                <StateTabs value={selectedState} onChange={(tab) => { setSelectedState(tab); storageSet(STORAGE_KEYS.dashboardTab, tab); }} />
+                <p className="mt-2 text-center text-[10px] text-subtle">
+                  These simulate first-day, missed-day, and empty-profile states.
+                </p>
+              </motion.div>
+            )}
+          </div>
+        </Reveal>
+
         {/* ===== Profile ===== */}
         <Reveal>
           <section id="profile" className="scroll-mt-28 rounded-2xl border border-border bg-surface p-4 shadow-[0_4px_24px_rgba(0,0,0,0.2)]">
@@ -477,6 +506,7 @@ export default function Dashboard() {
           </section>
         </Reveal>
       </main>
+      )}
 
       {/* ===== Sticky primary CTA above the bottom nav ===== */}
       <div className="fixed bottom-[calc(env(safe-area-inset-bottom)+64px)] left-0 right-0 z-40 px-5">
