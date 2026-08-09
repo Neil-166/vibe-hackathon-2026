@@ -14,7 +14,8 @@ const buttonVariants = cva(
         outline: 'border border-[rgba(255,255,255,0.06)] bg-transparent text-foreground hover:bg-white/5',
         destructive: 'bg-danger/10 text-danger border border-danger/25 hover:bg-danger/15',
         success: 'bg-success/10 text-success border border-success/25 hover:bg-success/15',
-        gradient: 'bg-[#ff5a00] text-white hover:bg-[#ff7a33] font-semibold',
+        gradient: 'bg-[#ff5a00] text-white hover:bg-[#ff7a33] font-semibold shadow-[0_4px_20px_rgba(255,90,0,0.35)]',
+        cta: 'bg-[#ff5a00] text-white hover:bg-[#ff7a33] font-bold shadow-[0_6px_28px_rgba(255,90,0,0.45)] ring-1 ring-primary/25',
         glass: 'glass text-white hover:bg-white/10',
       },
       size: {

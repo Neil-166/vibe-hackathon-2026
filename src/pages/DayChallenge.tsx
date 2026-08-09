@@ -352,10 +352,11 @@ export default function DayChallengePage() {
             </p>
             <Button
               type="button"
+              variant="cta"
               onClick={submit}
               disabled={!canSubmit}
               size="lg"
-              className="w-full font-bold shadow-[0_4px_24px_rgba(0,0,0,0.2)]"
+              className="w-full font-bold"
             >
               {isSubmitting ? (
                 <><Loader2 className="h-5 w-5 animate-spin" />Submitting…</>

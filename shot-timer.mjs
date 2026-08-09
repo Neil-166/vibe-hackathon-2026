@@ -1,0 +1,11 @@
+import { chromium } from 'playwright';
+const EXE = process.env.HOME + '/Library/Caches/ms-playwright/chromium-1208/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing';
+const browser = await chromium.launch({ executablePath: EXE });
+const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+await page.goto('http://localhost:4173/dashboard', { waitUntil: 'networkidle' });
+await page.waitForTimeout(3000);
+await page.mouse.wheel(0, 600);
+await page.waitForTimeout(500);
+await page.screenshot({ path: '/tmp/timer-check.png' });
+await browser.close();
+console.log('done');

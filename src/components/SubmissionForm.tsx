@@ -22,6 +22,19 @@ function isValidUrl(value: string): boolean {
   try { new URL(value); return true; } catch { return false; }
 }
 
+function ValidationIndicator({ ok, label }: { ok: boolean; label: string }) {
+  return (
+    <span className={`inline-flex items-center gap-1 text-[11px] font-medium ${ok ? 'text-success' : 'text-subtle'}`}>
+      {ok ? (
+        <svg className="h-3.5 w-3.5 shrink-0" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+      ) : (
+        <span className="inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-subtle/40" />
+      )}
+      {label}
+    </span>
+  );
+}
+
 const inputClasses =
   'input-field min-h-12 w-full px-4 text-sm';
 
@@ -80,18 +93,9 @@ export default function SubmissionForm({
       <div className="rounded-2xl border border-border bg-surface p-4 shadow-[0_4px_24px_rgba(0,0,0,0.2)]">
         <p className="text-xs font-semibold text-foreground">Required to submit</p>
         <div className="mt-2 space-y-1.5">
-          <p className={cn('flex items-center gap-2 text-[12px]', githubOk ? 'text-success' : 'text-muted')}>
-            {githubOk ? <CheckCircle2 className="h-3.5 w-3.5 shrink-0" /> : <span className="ml-0.5 h-1.5 w-1.5 shrink-0 rounded-full bg-subtle/50" />}
-            At least one GitHub link (repository or commit)
-          </p>
-          <p className={cn('flex items-center gap-2 text-[12px]', linkedinOk ? 'text-success' : 'text-muted')}>
-            {linkedinOk ? <CheckCircle2 className="h-3.5 w-3.5 shrink-0" /> : <span className="ml-0.5 h-1.5 w-1.5 shrink-0 rounded-full bg-subtle/50" />}
-            A LinkedIn post link
-          </p>
-          <p className={cn('flex items-center gap-2 text-[12px]', buildNotesOk ? 'text-success' : 'text-muted')}>
-            {buildNotesOk ? <CheckCircle2 className="h-3.5 w-3.5 shrink-0" /> : <span className="ml-0.5 h-1.5 w-1.5 shrink-0 rounded-full bg-subtle/50" />}
-            What you built today
-          </p>
+          <ValidationIndicator ok={githubOk} label="At least one GitHub link (repository or commit)" />
+          <ValidationIndicator ok={linkedinOk} label="A LinkedIn post link" />
+          <ValidationIndicator ok={buildNotesOk} label="What you built today" />
         </div>
       </div>
 
@@ -113,6 +117,11 @@ export default function SubmissionForm({
           {githubRepo && !githubRepoValid && (
             <p className="mt-1.5 text-[11px] text-danger">Enter a valid URL (e.g. https://github.com/...)</p>
           )}
+          {githubRepo && githubRepoValid && (
+            <p className="mt-1.5 flex items-center gap-1 text-[11px] text-success">
+              <CheckCircle2 className="h-3 w-3" /> Looks good — valid repository URL
+            </p>
+          )}
         </div>
 
         <div>
@@ -132,6 +141,11 @@ export default function SubmissionForm({
           />
           {githubCommit && !githubCommitValid && (
             <p className="mt-1.5 text-[11px] text-danger">Enter a valid URL</p>
+          )}
+          {githubCommit && githubCommitValid && (
+            <p className="mt-1.5 flex items-center gap-1 text-[11px] text-success">
+              <CheckCircle2 className="h-3 w-3" /> Valid commit URL
+            </p>
           )}
         </div>
 
@@ -161,6 +175,11 @@ export default function SubmissionForm({
           />
           {linkedin && !linkedinValid && (
             <p className="mt-1.5 text-[11px] text-danger">Enter a valid LinkedIn post URL</p>
+          )}
+          {linkedin && linkedinValid && (
+            <p className="mt-1.5 flex items-center gap-1 text-[11px] text-success">
+              <CheckCircle2 className="h-3 w-3" /> Looks good — valid LinkedIn URL
+            </p>
           )}
         </div>
 

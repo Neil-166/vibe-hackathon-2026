@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import AnimatedBackground from '@/components/AnimatedBackground';
 
 import DashboardSkeleton from '@/components/DashboardSkeleton';
+import StreakCountdown from '@/components/StreakCountdown';
 import EmptyState from '@/components/EmptyState';
 import EnergyCheckin from '@/components/EnergyCheckin';
 import FocusSprint from '@/components/FocusSprint';
@@ -226,11 +227,18 @@ export default function Dashboard() {
                 <p className="mt-1.5 text-[12px] leading-relaxed text-muted">{day12Challenge.goal}</p>
               </div>
               <Link to="/day/12" className="mt-3 block">
-                <Button variant="default" size="sm" className="w-full min-h-12 font-bold">
+                <Button variant="cta" size="sm" className="w-full min-h-12 font-bold">
                   Start tonight&apos;s challenge <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
             </section>
+          </Reveal>
+        )}
+
+        {/* ===== Streak countdown timer ===== */}
+        {selectedState === 'active' && !completed && (
+          <Reveal delay={0.1}>
+            <StreakCountdown />
           </Reveal>
         )}
 
@@ -458,32 +466,6 @@ export default function Dashboard() {
           </section>
         </Reveal>
 
-        {/* ===== Demo: edge-state toggle (for reviewers to explore edge cases) ===== */}
-        <Reveal>
-          <div>
-            <button
-              type="button"
-              onClick={() => setShowStateTabs((v) => !v)}
-              className="flex w-full items-center justify-center gap-1.5 text-[11px] font-medium text-subtle transition-colors hover:text-muted"
-            >
-              {showStateTabs ? 'Hide demo states' : 'Show demo states'} <ChevronDown className={`h-3 w-3 transition-transform ${showStateTabs ? 'rotate-180' : ''}`} />
-            </button>
-            {showStateTabs && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                className="mt-2 overflow-hidden"
-              >
-                <StateTabs value={selectedState} onChange={(tab) => { setSelectedState(tab); storageSet(STORAGE_KEYS.dashboardTab, tab); }} />
-                <p className="mt-2 text-center text-[10px] text-subtle">
-                  These simulate first-day, missed-day, and empty-profile states.
-                </p>
-              </motion.div>
-            )}
-          </div>
-        </Reveal>
-
         {/* ===== Profile ===== */}
         <Reveal>
           <section id="profile" className="scroll-mt-28 rounded-2xl border border-border bg-surface p-4 shadow-[0_4px_24px_rgba(0,0,0,0.2)]">
@@ -514,20 +496,46 @@ export default function Dashboard() {
           {stickyCta.href ? (
             <Link to={stickyCta.href} className="block">
               <Button
-                variant={completed ? 'success' : 'gradient'}
+                variant={completed ? 'success' : 'cta'}
                 size="lg"
-                className="w-full font-bold shadow-[0_8px_30px_rgba(0,0,0,0.45)]"
+                className="w-full font-bold"
               >
                 {completed ? <CheckCircle2 className="h-5 w-5" /> : <Flame className="h-5 w-5 flame-pulse" />}
                 {stickyCta.label} <ArrowRight className="ml-1 h-4 w-4" />
               </Button>
             </Link>
           ) : (
-            <Button onClick={stickyCta.onClick ?? scrollToProfile} size="lg" className="w-full font-bold shadow-[0_8px_30px_rgba(0,0,0,0.45)]">
+            <Button onClick={stickyCta.onClick ?? scrollToProfile} variant="cta" size="lg" className="w-full font-bold">
               <UserRound className="h-5 w-5" /> {stickyCta.label} <ArrowRight className="ml-1 h-4 w-4" />
             </Button>
           )}
         </div>
+      </div>
+
+      {/* ===== Floating edge-case badge (for reviewers to explore edge cases) ===== */}
+      <div className="fixed bottom-[calc(env(safe-area-inset-bottom)+80px)] left-4 z-50">
+        <button
+          type="button"
+          onClick={() => setShowStateTabs((v) => !v)}
+          className="flex h-10 items-center gap-1.5 rounded-full border border-border bg-surface/90 px-3 text-[10px] font-semibold text-subtle shadow-[0_4px_16px_rgba(0,0,0,0.4)] backdrop-blur-sm transition-all hover:border-primary/30 hover:text-foreground"
+          aria-label="Toggle demo edge-case states"
+        >
+          <span className="inline-block h-2 w-2 rounded-full bg-primary" />
+          {showStateTabs ? 'Hide states' : 'Demo states'}
+        </button>
+        {showStateTabs && (
+          <motion.div
+            initial={{ opacity: 0, y: 8, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            className="absolute bottom-12 left-0 w-[280px] overflow-hidden rounded-2xl border border-border bg-surface/95 p-3 shadow-[0_8px_32px_rgba(0,0,0,0.5)] backdrop-blur-md"
+          >
+            <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-subtle">Edge-case states</p>
+            <StateTabs value={selectedState} onChange={(tab) => { setSelectedState(tab); storageSet(STORAGE_KEYS.dashboardTab, tab); }} />
+            <p className="mt-2 text-center text-[9px] text-subtle">
+              Simulates first-day, missed-day, and empty-profile.
+            </p>
+          </motion.div>
+        )}
       </div>
 
       {/* ===== Missed-day resume flow (full-screen sheet) ===== */}
